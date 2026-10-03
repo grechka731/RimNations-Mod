@@ -4,7 +4,15 @@
 [![Engine](https://img.shields.io/badge/RimWorld-1.6-brightgreen.svg)](https://rimworldgame.com/)
 [![Runtime](https://img.shields.io/badge/Platform-.NET%20Framework%204.7.2-blue.svg)](https://dotnet.microsoft.com/)
 [![Built By](https://img.shields.io/badge/Code-100%25%20Vibecode%20(Google%20Antigravity%20AI)-orange.svg)](#важное-уведомление--это-всё-вайбкод-)
-[![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/grechka731/RimNations-Mod?color=blue&label=Mod%20Release)](https://github.com/grechka731/RimNations-Mod/releases/latest)
+[![Download](https://img.shields.io/badge/Download-RimNationsMod.zip-brightgreen.svg)](https://github.com/grechka731/RimNations-Mod/releases/download/v1.0.0/RimNationsMod.zip)
+
+---
+
+### 📦 Быстрая установка готового мода (Без компиляции)
+> Чтобы просто играть в мод, не нужно ничего компилировать!
+> Перейдите в раздел **[Releases](https://github.com/grechka731/RimNations-Mod/releases/latest)** и скачайте **[`RimNationsMod.zip`](https://github.com/grechka731/RimNations-Mod/releases/download/v1.0.0/RimNationsMod.zip)**.
+> Распакуйте архив в папку `RimWorld/Mods/` и включите мод в игре.
 
 ---
 
