@@ -1,59 +1,84 @@
-# 👑 RimNations: Grand Strategy Mod (Source Code)
-### Полные исходные коды C# модификации RimNations для RimWorld 1.6
+# RimNations: Grand Strategy Client Architecture
+
+Клиентский программный модуль для RimWorld 1.6, расширяющий базовую архитектуру игры до уровня многопользовательской геополитической стратегии (Grand Strategy MMO).
 
 [![Engine](https://img.shields.io/badge/RimWorld-1.6-brightgreen.svg)](https://rimworldgame.com/)
 [![Runtime](https://img.shields.io/badge/Platform-.NET%20Framework%204.7.2-blue.svg)](https://dotnet.microsoft.com/)
-[![Built By](https://img.shields.io/badge/Code-100%25%20Vibecode%20(Google%20Antigravity%20AI)-orange.svg)](#важное-уведомление--это-всё-вайбкод-)
-[![Release](https://img.shields.io/github/v/release/grechka731/RimNations-Mod?color=blue&label=Mod%20Release)](https://github.com/grechka731/RimNations-Mod/releases/latest)
-[![Download](https://img.shields.io/badge/Download-RimNationsMod.zip-brightgreen.svg)](https://github.com/grechka731/RimNations-Mod/releases/download/v1.0.0/RimNationsMod.zip)
+[![Code Origin](https://img.shields.io/badge/Codebase-Synthetic%20%2F%20AI%20Generated-purple.svg)](#происхождение-кодовой-базы-и-методология)
+[![Latest Release](https://img.shields.io/github/v/release/grechka731/RimNations-Mod?label=Release)](https://github.com/grechka731/RimNations-Mod/releases/latest)
 
 ---
 
-### 📦 Быстрая установка готового мода (Без компиляции)
-> Чтобы просто играть в мод, не нужно ничего компилировать!
-> Перейдите в раздел **[Releases](https://github.com/grechka731/RimNations-Mod/releases/latest)** и скачайте **[`RimNationsMod.zip`](https://github.com/grechka731/RimNations-Mod/releases/download/v1.0.0/RimNationsMod.zip)**.
-> Распакуйте архив в папку `RimWorld/Mods/` и включите мод в игре.
+## Бинарные сборки (Releases)
+
+Для использования модификации без сборки из исходного кода используйте официальный раздел релизов:
+- **Официальный релиз:** [GitHub Releases v1.0.0](https://github.com/grechka731/RimNations-Mod/releases/latest)
+- **Прямая загрузка пакета:** [`RimNationsMod.zip`](https://github.com/grechka731/RimNations-Mod/releases/download/v1.0.0/RimNationsMod.zip)
+
+**Порядок установки:**
+1. Загрузить архив `RimNationsMod.zip`.
+2. Распаковать содержимое архива в директорию модов игры: `<RimWorld>/Mods/RimNations`.
+3. Активировать модуль в менеджере модификаций после `Harmony` и `Core`.
 
 ---
 
-## ⚡ ВАЖНОЕ УВЕДОМЛЕНИЕ: ЭТО ВСЁ ВАЙБКОД! / THIS IS ALL VIBECODE!
+## Архитектурные подсистемы
 
-### [Русский]
-> **💥 ВНИМАНИЕ: ЭТОТ РЕПОЗИТОРИЙ — 100% ЧИСТЫЙ ВАЙБКОД!**  
-> Вся кодовая база этой модификации: 3D-рендер границ на глобусе планеты на GPU, двухрежимный движок тиков (FocusMap/GovernorMap), система конституционных министерств с разделением полномочий, глобальная товарная биржа (Order Book), интерактивные КПП, ЧВК, система государственных займов под залог городов и математические алгоритмы уникальных цветов наций были **полностью написаны нейросетью (Google Antigravity AI)** в режиме интерактивного вайбкодинга!  
-> Здесь нет ни строчки кода, написанной человеком-программистом. Код компилируется без единой ошибки (0 ошибок) и строго следует стандартам Verse/RimWorld 1.6 API. Тем не менее, это чистый ИИ-вайбкод — в нем могут встретиться интересные граничные эффекты или неожиданные нюансы механик. Исследуйте код, экспериментируйте и присылайте пуллреквесты!
+Модификация включает в себя следующий набор программных компонентов:
 
-### [English]
-> **💥 ATTENTION: THIS REPOSITORY IS 100% PURE VIBECODE!**  
-> This entire codebase: 3D spherical world boundary mesh rendering on GPU, dual-state tick throttling engine, constitutional ministry system, global commodities order book, interactive border checkpoints, PMCs, collateralized sovereign debt, and deterministic distinct color distribution algorithms were **authored and generated entirely by an Artificial Intelligence / Neural Network (Google Antigravity AI)** via end-to-end prompt-driven vibecoding!  
-> Not a single line was written by a human software developer. It compiles cleanly with 0 errors. As genuine AI vibecode, it may contain edge-case quirks. Inspect the code, experiment, and submit PRs!
+### 1. Подсистема рендеринга границ на сфере (GPU WorldLayer)
+- **Файл:** `Source/Client/GrandStrategy/UI/WorldLayer_NationBorders.cs`
+- **Алгоритм кластеризации:** Процедурная генерация связных полигонов территорий (`GenerateOrganicTerritory`) с топологическим обходом соседних тайлов через граф смежности гексагональной сетки RimWorld (`WorldGrid`). 
+  - Размер столичного региона: 10–13 тайлов.
+  - Размер провинциальных городов: 7–10 тайлов.
+  - Исключение концентрических геометрических фигур фиксированного радиуса в пользу стохастического расширения.
+- **Отрисовка:** Разделение мешей по батчам материалов на уровне GPU с индивидуальными параметрами полупрозрачности и независимыми буферами вершин для каждого суверенного субъекта.
+- **Цветовая дифференциация:** Детерминированный 16-якорный алгоритм на базе хэша FNV-1a от строкового идентификатора игрока, проецирующий результат в цветовое пространство HSV с фиксированным насыщением (0.85) и яркостью (0.95).
+
+### 2. Подсистема регуляции нагрузки виртуальных карт (GovernorMap Handover)
+- **Файлы:** `Harmony/Patch_ZeroOverheadVassalMap.cs`, `Harmony/Patch_MapTicking.cs`
+- Двухуровневая модель тиков:
+  - `FocusMap`: Полный цикл симуляции физики и ИИ (60 TPS).
+  - `GovernorMap`: Редуцированный цикл тиков (деградация частоты в 8 раз, 7.5 TPS) для вассальных и периферийных поселений с сохранением только макроэкономических вычислений.
+
+### 3. Институциональная модель управления (State Governance)
+- **Файлы:** `Core/GovernmentModels.cs`, `UI/Dialog_RimNationsDashboard.cs`
+- Система государственных должностей (`GovernmentOffice`) с битовой маской разрешений:
+  - `CanDeclareWar`
+  - `CanAuthorizePeace`
+  - `CanManageImmigration`
+  - `CanAdjustTariffs`
+  - `CanAccessTreasury`
+- Поддержка форм государственного устройства: монархия, республика, военная хунта, технократия, торговая гильдия с пассивными модификаторами фракции.
+
+### 4. Межгосударственный товарно-финансовый рынок
+- **Файлы:** `UI/Dialog_RimNationsDashboard.cs`, `Harmony/Patch_CaravanTransitTax.cs`
+- Централизованный биржевой стакан (`OrderBook`) с фильтрацией по товарным категориям.
+- Интерактивный таможенный барьер при пересечении границ суверенных территорий с динамическим начислением пошлин или генерацией повода для объявления войны (`Casus Belli`).
+- Инструменты трансграничного кредитования под залог территориальных единиц и лизинг боевых подразделений (ЧВК).
 
 ---
 
-## 📁 Структура исходного кода
+## Происхождение кодовой базы и методология
 
-- `Source/Client/GrandStrategy/` — Ядро глобальной стратегии:
-  - `UI/WorldLayer_NationBorders.cs` — 3D GPU-меш рендерер границ на планете, алгоритм органического захвата территорий (10–13 клеток для столицы, 7–10 для городов), система независимых цветовых батчей.
-  - `UI/Dialog_RimNationsDashboard.cs` — Главная панель державы (горячая клавиша **U**), разделы геральдики, министерств, дипломатии, биржи и займов.
-  - `Core/WorldComponent_StateGovernor.cs` — Высококонтрастная 16-якорная алгоритмическая генерация цветов по логину, управление казной, ЧВК и займами.
-  - `Core/GovernmentModels.cs` — Модели данных министерств, контрактов, долговых обязательств и разрешений.
-  - `Harmony/Patch_CaravanTransitTax.cs` — Интерактивный перехват караванов на суверенных границах.
-  - `Harmony/Patch_ZeroOverheadVassalMap.cs` & `Patch_MapTicking.cs` — Двухрежимный движок тиков (60 TPS FocusMap vs 8x throttled GovernorMap).
-- `Source/Client/UnionDll/` — Сетевые протоколы, сериализаторы пакетов `ModelPlayToServer` / `ModelPlayToClient`.
-- `Source/Client.sln` — Готовое решение для сборки через Visual Studio 2022 / `dotnet build`.
+Данный репозиторий представляет собой результат реализации парадигмы автоматизированной генерации программного обеспечения методом сквозного ИИ-программирования («вайбкодинг»).
+
+1. **Генерация:** 100% исходного кода, структуры данных и сетевой логики сгенерированы большой языковой моделью (Google Antigravity AI) на основе формализованных технических спецификаций.
+2. **Верификация:** Исходный код верифицирован компилятором Roslyn / .NET Framework 4.7.2 со статусом 0 ошибок компиляции и проверен на соответствие API RimWorld 1.6 Verse.
+3. **Особенности:** Ввиду синтетической природы кода отдельные краевые сценарии и граничные условия могут демонстрировать нестандартное поведение. Рекомендуется технический аудит при модификации критических узлов.
 
 ---
 
-## 🛠 Сборка из исходников
+## Сборка из исходных кодов
+
+Требования:
+- .NET SDK (версия 6.0 или новее)
+- Установленная копия RimWorld 1.6
 
 ```bash
 cd Source
-dotnet build Client.sln -c Release -p:RimWorldFolder="C:\Путь\К\RimWorld\\"
+dotnet build Client.sln -c Release -p:RimWorldFolder="<Path_To_RimWorld>"
 ```
-Скомпилированная библиотека автоматически выводится в `BuildOutput/Client/Release/RimWorldOnlineCity.dll`.
 
----
-
-## 📜 Credits
-- Сетевая архитектура вдохновлена проектом **OnlineCity** (kfish).
-- Вся геополитика, механики суверенных наций и 100% вайбкода созданы **Google Antigravity AI**.
+Выходной бинарный файл размещается по пути:
+`BuildOutput/Client/Release/RimWorldOnlineCity.dll`
