@@ -1,0 +1,15 @@
+# Visual Studio & .NET Build Artifacts
+.vs/
+[Bb]in/
+[Oo]bj/
+[Bb]uild[Oo]utput/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
